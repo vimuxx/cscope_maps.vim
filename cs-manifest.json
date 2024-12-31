@@ -1,0 +1,64 @@
+{
+  "protocol_version": "1.0",
+  "tool_definition": {
+    "name": "local_code_navigation_indexer",
+    "description": "Generates code navigation databases (for cscope and clangd) for various project types like the Linux Kernel, U-Boot, and QEMU, using project-specific strategies. Note: For projects like the Linux Kernel, this script must be run from the directory where the .config file is located. Most subcommands require a prior compilation as they rely on build artifacts; only 'find' operates directly on source files.",
+    "execution_mode": "local",
+    "project_url": "https://github.com/vimuxx/cscope_maps.vim",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "subcommand": {
+          "type": "string",
+          "description": "The primary mode of operation, tailored for a specific project type. Requires the project to be compiled before use, unless using 'find'.",
+          "enum": [
+            "default",
+            "find",
+            "freebsd",
+            "llvm",
+            "ninja",
+            "qemu",
+            "uboot",
+            "uefi"
+          ],
+          "default": "default"
+        },
+        "target_directory": {
+          "type": "string",
+          "description": "The path to the target source code directory. For projects like the Linux kernel, this must be the directory where the .config file is located. The cs command will be executed in this directory. If not provided, the command is executed in the current working directory."
+        },
+        "use_absolute_paths": {
+          "type": "boolean",
+          "description": "Sets the 'KBUILD_ABS_SRCTREE=1' environment variable. If true, output paths will be absolute.",
+          "default": false
+        },
+        "resolve_symlinks": {
+          "type": "boolean",
+          "description": "Sets the 'SYMLINKS=1' environment variable. If true, symbolic links in file paths will be resolved.",
+          "default": false
+        }
+      },
+      "required": []
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "status_message": {
+          "type": "string",
+          "description": "A summary of the operations performed, such as 'GEN cscope' or any error messages."
+        },
+        "generated_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of the absolute paths to the generated index files, such as 'cscope.files', 'cscope.out', and 'compile_commands.json'."
+        },
+        "exit_code": {
+          "type": "integer",
+          "description": "The final exit code of the script execution."
+        }
+      }
+    }
+  }
+}
